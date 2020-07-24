@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <title>Shopping Cart</title>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1">
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.css" rel="stylesheet" />
+   <link href="style.css" rel="stylesheet">
+</head>
+
+<body>
+
+   <section>
+      <div class="container">
+         <div class="cart" id="cart">
+            <div class="col-md-12 col-lg-10 mx-auto">
+               <div class="cart-item">
+                  <div class="row">
+                     <div class="col-md-7 center-item">
+                        <img src="images/product-1.png" alt="">
+                        <h5>iPhone 11 128GB Black</h5>
+                     </div>
+
+                     <div class="col-md-5 center-item">
+                        <div class="input-group number-spinner">
+                           <button class="btn btn-default minus"><i class="fas fa-minus"></i></button>
+                           <input type="text" class="form-control text-center" value="1" disabled>
+                           <button class="btn btn-default plus"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <h5>$<span>1219</span></h5>
+                        <img src="images/remove.png" alt="" class="remove-item">
+                     </div>
+                  </div>
+               </div>
+
+               <div class="cart-item">
+                  <div class="row">
+                     <div class="col-md-7 center-item mx-auto">
+                        <img src="images/product-2.png" alt="">
+                        <h5>iPhone 11 Silicone Case - Black</h5>
+                     </div>
+                     <div class="col-md-5 center-item">
+                        <div class="input-group number-spinner">
+                           <button class="btn btn-default minus"><i class="fas fa-minus"></i></button>
+                           <input type="text" class="form-control text-center" value="1" disabled>
+                           <button class="btn btn-default plus"><i class="fas fa-plus"></i></button>
+
+                        </div>
+                        <h5>$<span>59</span></h5>
+                        <img src="images/remove.png" alt="" class="remove-item">
+                     </div>
+                  </div>
+               </div>
+
+               <div class="cart-item">
+                  <div class="row">
+
+                     <div class="col-md-8">
+                        <h5>Subtotal: </h5>
+                        <h5>Tax(5%):</h5>
+                        <h5>Total:</h5>
+                     </div>
+
+                     <div class="col-md-4 status">
+                        <h5>$<span id="subtotal">1,278</span></h5>
+                        <h5>$<span id="tax">63.9</span></h5>
+                        <h5>$<span id="total">1,341.9</span></h5>
+                     </div>
+                  </div>
+               </div>
+               <div class="col-md-12 pt-4 pb-4">
+                  <button type="button" class="btn btn-success check-out">Check Out</button>
+               </div>
+            </div>
+         </div>
+      </div>
+   </section>
+
+   <script>
+      document.getElementById("cart").addEventListener("click", (event)=>{
+         let element = event.target;
+
+         if(element.classList.contains("plus") || element.parentNode.classList.contains("plus")) {
+            if(element.parentNode.classList.contains("plus")) element = element.parentNode;
+            const avgPrice = parseInt(element.parentNode.nextElementSibling.childNodes[1].innerText)
+                                 / parseInt(element.previousElementSibling.value);
+
+            setPrice1(element.parentNode.nextElementSibling.childNodes[1], avgPrice);
+            setLabel(element.previousElementSibling, 1);
+            setTotal(avgPrice);
+
+         } else if(element.classList.contains("minus") || element.parentNode.classList.contains("minus")){
+            if(element.parentNode.classList.contains("minus")) element = element.parentNode;
+            const avgPrice = parseInt(element.parentNode.nextElementSibling.childNodes[1].innerText) 
+                                 / parseInt(element.nextElementSibling.value);
+
+            if(element.nextElementSibling.value !== "1") {
+               setPrice1(element.parentNode.nextElementSibling.childNodes[1], -1*avgPrice);
+               setLabel(element.nextElementSibling, -1);
+               setTotal(-1*avgPrice);
+            }
+            
+         } else if(element.classList.contains("remove-item")){
+            const prevElement = element.previousElementSibling.childNodes[1].innerText;
+            setTotal(-1*parseInt(prevElement));
+            element.parentNode.parentNode.parentNode.parentNode.removeChild(event.target.parentNode.parentNode.parentNode);
+         }
+      });
+
+      function setLabel(element, value) {
+         element.value = parseInt(element.value) + value;
+      }
+
+      function setPrice1(priceElement, avgPrice) {
+         priceElement.innerText = avgPrice + parseInt(priceElement.innerText);
+      }
+
+      function setPrice2(element, value) {
+         element.innerText = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      function setTotal(price){
+         const subtotal = updateSubTotal(price);
+         const tax = updateTax(subtotal);
+         updateTotal(subtotal, tax);
+      }
+
+      function updateSubTotal(avgPrice) {
+         const element = document.getElementById("subtotal");
+         const value = parseInt(element.innerText.replace(/,/g, '')) + avgPrice;
+         setPrice2(element, value);
+         return value;
+      }
+
+      function updateTax(value) {
+         value = (value*5)/100;
+         const element = document.getElementById("tax");
+         setPrice2(element, value);
+         return value;
+      }
+
+      function updateTotal(value1, value2) {
+         const element = document.getElementById("total");
+         const value = value1 + value2;
+         setPrice2(element, value);
+      }
+   </script>
+</body>
+
+</html>
